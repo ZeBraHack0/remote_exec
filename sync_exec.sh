@@ -14,6 +14,7 @@ PORT=22
 SSH_LIST=(
     # hop_format: username@ip port container_name, e.g., root@192.168.0.1 22 node_1
     "${myuser}@192.168.211.109 ${PORT} ${mydocker}"
+    "${myuser}@192.168.211.110 ${PORT} ${mydocker}"
 )
 
 sync_start() {
