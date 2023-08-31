@@ -1,6 +1,6 @@
 # remote_exec
 
-## execute and kill programs on multiple servers concurrently and automatically
+execute and kill programs on multiple servers concurrently and automatically
 
 ### start a new program
 ```
