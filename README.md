@@ -1,10 +1,10 @@
 # remote_exec
 
-execute, log, and kill programs on multiple servers concurrently and automatically
+execute, log, and kill programs and sync files on multiple servers concurrently and automatically
 
 ### setup
 
-fill in the following local variables in the script:
+fill in the following local variables in the script according to your requirement:
 
 - myuser: your username in the server
 - mypasswd: your password for ssh access
@@ -12,6 +12,7 @@ fill in the following local variables in the script:
 - SSH_LIST: your server list
 - cmd: your commands to execute on remote servers
 - key_word: keywords to grep your pids to kill 
+- RE_DIR: remote directory to sync your file
 
 ### start a new program
 ```shell
@@ -29,6 +30,14 @@ bash sync_exec.sh docker
 ```shell
 bash sync_exec.sh stop
 ```
+
+### sync files from local directory to remote directories
+
+```shell
+bash sync_exec.sh file
+```
+
+
 
 
 

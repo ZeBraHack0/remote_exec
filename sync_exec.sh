@@ -9,12 +9,14 @@ source ./include/YCNic.sh
 mypasswd=""
 myuser="" 
 mydocker=""
+BE_DIR="$(cd "`dirname ${BASH_SOURCE[0]}`"/..; pwd)"
+RE_DIR="" 
 
 PORT=22
 SSH_LIST=(
     # hop_format: username@ip port container_name, e.g., root@192.168.0.1 22 node_1
-    "${myuser}@192.168.211.109 ${PORT} ${mydocker}"
-    "${myuser}@192.168.211.110 ${PORT} ${mydocker}"
+    "${myuser}@192.168.211.109 ${PORT} ${mydocker} ${RE_DIR}"
+    "${myuser}@192.168.211.110 ${PORT} ${mydocker} ${RE_DIR}"
 )
 
 sync_start() {
@@ -51,11 +53,46 @@ sync_stop() {
     done
 }
 
+
+sync_one_hop() {
+    local bedir=$1
+    local info1=$2
+    local port1=$3 
+    local redir=$4
+    if [ ! ${redir} ]; then
+        echo_warn "Please specify the remote directory"
+        exit 0
+    fi
+    echo_info "Synchronizing ${bedir} to ${info1}:${port1}:${redir}"
+    fswatch -o $bedir | while read f; do rsync --delete -avzhcPe "ssh -p ${port1}" ${bedir} ${info1}:${redir}; done &
+    echo_info "Done! (PID: $!)"
+}
+
+sync_file() {
+    if [ ! ${BE_DIR} ]; then
+        echo_warn "Please specify the local directory"
+        exit 0
+    fi
+    if [ ! -d ${BE_DIR} ]; then
+        echo_erro "${BE_DIR} does not exist"
+        exit 0
+    fi
+    for ssh_item in "${SSH_LIST[@]}"; do
+        local ssh_para=(${ssh_item})
+        if (( ${#ssh_para[*]} == 3 )); then
+            sync_one_hop ${BE_DIR} ${ssh_para[0]} ${ssh_para[1]} ${ssh_para[3]}
+        else
+            echo_erro "unsupported format: ${ssh_para}"
+        fi
+    done
+}
+
 show_usage() {
     appname=$0
     echo_info "Usage: ${appname} [command], e.g., ${appname} start"
     echo_info "  start"
     echo_info "  docker"
+    echo_info "  file"
     echo_info "  stop"
     echo_info "  -- help                          show help message"
 }
@@ -80,6 +117,9 @@ case ${global_choice} in
         ;;
     "docker")
         docker_start
+        ;;
+    "file")
+        sync_file
         ;;
     "stop")
         sync_stop
